@@ -33,6 +33,18 @@
             </select>
         </div>
 
+        <div class="my-3">
+            <label for="">Tipo di cibo</label>
+
+            @foreach ($tags as $tag)
+                <label for="">
+                    <input type="checkbox" name="tags[]" value="{{ $tag->id }}">
+                    {{ $tag->name }}
+                </label>
+            @endforeach
+
+        </div>
+
         <button class="btn btn-success">Crea post</button>
     </form>
 @endsection

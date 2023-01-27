@@ -41,6 +41,19 @@ Cos'e' non ti piace il post?
             </select>
         </div>
 
+        <div class="my-3">
+            <label for="">Tipo di cibo</label>
+
+            @foreach ($tags as $tag)
+                <label for="">
+                    <input class="form-check-input" type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                        {{ $elem->tags->contains($tag) ? 'checked' : '' }}>
+                    {{ $tag->name }}
+                </label>
+            @endforeach
+
+        </div>
+
     <button type="submit" class="btn btn-primary">Crea record</button>
 </form>
 @endsection
