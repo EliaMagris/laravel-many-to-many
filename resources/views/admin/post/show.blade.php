@@ -33,6 +33,8 @@
             </p>
         </div>
 
+        <img src="{{asset("storage/$elem->cover")}}" alt="">
+
         <a href="{{ route('admin.posts.index') }}"><i class="fa-solid fa-left-long"></i></a>
 
 @endsection

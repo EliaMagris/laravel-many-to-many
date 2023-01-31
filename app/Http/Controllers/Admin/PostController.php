@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
+use App\Mail\ConfirmPostMail;
+use Illuminate\Support\Facades\Mail;
 
 use Illuminate\Support\Facades\Auth;
+use \Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -60,6 +63,16 @@ class PostController extends Controller
         //dd($data);
 
         $newPost = new Post();
+
+        if(array_key_exists('image', $data)){
+            $cover_url = Storage::put('post_covers', $data['image']);
+            $data['cover'] = $cover_url;
+        }  
+
+        $email = new ConfirmPostMail($newPost);
+        $userEmail = Auth::user()->email;
+        Mail::to($userEmail)->send($email);
+
         $newPost->fill($data);
         $newPost->save();
         //dd($data);
@@ -141,6 +154,9 @@ class PostController extends Controller
     public function destroy($id)
     {
         $singlePost = Post::findOrFail($id);
+        if($singlePost->cover){
+            Storage::delete($singlePost->cover);
+        };
         $singlePost->tags()->sync([]);
         $singlePost->delete();
         return redirect()->route('admin.posts.index');

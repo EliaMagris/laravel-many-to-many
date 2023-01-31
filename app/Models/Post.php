@@ -12,7 +12,8 @@ class Post extends Model
         'name',
         'date',
         'description',
-        'category_id'
+        'category_id',
+        'cover'
 
     ];
 
