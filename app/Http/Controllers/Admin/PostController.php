@@ -23,13 +23,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        // $userId = Auth::id();
-        // $user = Auth::user();
 
-        // $data = [
-        //     'userId' => $userId,
-        //     'user' => $user
-        // ];
         $data = [
             'posts' => Post::with('category')->paginate(10)
         ];
@@ -47,7 +41,6 @@ class PostController extends Controller
     {
         $categories = Category::All();
         $tags = Tag::All();
-
         return view('admin.post.create', compact('categories', 'tags'));
     }
 
@@ -64,18 +57,17 @@ class PostController extends Controller
 
         $newPost = new Post();
 
-        if(array_key_exists('image', $data)){
+        if (array_key_exists('image', $data)) {
             $cover_url = Storage::put('post_covers', $data['image']);
             $data['cover'] = $cover_url;
-        }  
+        }
+
+        $newPost->fill($data);
+        $newPost->save();
 
         $email = new ConfirmPostMail($newPost);
         $userEmail = Auth::user()->email;
         Mail::to($userEmail)->send($email);
-
-        $newPost->fill($data);
-        $newPost->save();
-        //dd($data);
 
         if (array_key_exists('tags', $data)) {
             $newPost->tags()->sync($data['tags']);
@@ -125,13 +117,13 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
         // $categories = Category::findOrFail($id);
         // $request->validate(
-            // [
-            //     'name' => 'required|max:50'
-            // ],
-            // [
-            //     'name.required' => 'Attenzione il campo name è obbligatorio',
-            //     'name.max' => 'Attenzione il campo non deve superare i 50 caratteri'
-            // ]
+        // [
+        //     'name' => 'required|max:50'
+        // ],
+        // [
+        //     'name.required' => 'Attenzione il campo name è obbligatorio',
+        //     'name.max' => 'Attenzione il campo non deve superare i 50 caratteri'
+        // ]
         // );
         $post->update($data);
         // $post->update($categories);
@@ -141,6 +133,7 @@ class PostController extends Controller
         } else {
             $post->tags()->sync([]);
         }
+
 
         return redirect()->route('admin.posts.show', $post->id)->with('success', "Hai modificato con successo: $post->name");
     }
@@ -154,9 +147,10 @@ class PostController extends Controller
     public function destroy($id)
     {
         $singlePost = Post::findOrFail($id);
-        if($singlePost->cover){
+        if ($singlePost->cover) {
             Storage::delete($singlePost->cover);
-        };
+        }
+        ;
         $singlePost->tags()->sync([]);
         $singlePost->delete();
         return redirect()->route('admin.posts.index');
